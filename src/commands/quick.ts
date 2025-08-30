@@ -1,36 +1,49 @@
 import chalk from 'chalk';
-import ora from 'ora';
 import { execSync } from 'child_process';
 import { WinRMConfig } from '../types/config.js';
 import { PowerShellRunner } from '../lib/powershell.js';
 import { CertificateManager } from '../lib/certificate.js';
+import { StepProgress, colors, symbols, messages } from '../lib/ui.js';
 
 export async function quickCommand(options: any) {
-  console.log(chalk.blue.bold('Starting Quick Setup'));
-  console.log(chalk.gray('Configuring WinRM with secure defaults...\n'));
+  console.log();
+  console.log(colors.muted('  Quick Setup'));
+  console.log(colors.muted('  Configuring WinRM with secure defaults...\n'));
 
-  const steps = [
-    { text: 'Checking prerequisites', action: checkPrerequisites },
-    { text: 'Creating self-signed certificate', action: createCertificate },
-    { text: 'Configuring HTTPS listener', action: configureHTTPS },
-    { text: 'Setting authentication methods', action: setAuthentication },
-    { text: 'Configuring firewall rules', action: configureFirewall },
-    { text: 'Testing configuration', action: testConfiguration },
+  const setupSteps = [
+    'Verifying system requirements',      
+    'Generating security certificate',     
+    'Setting up secure connection',        
+    'Configuring authentication',          
+    'Updating firewall settings',          
+    'Verifying setup works',              
   ];
 
-  for (const step of steps) {
-    const spinner = ora(step.text).start();
+  const actions = [
+    checkPrerequisites,
+    createCertificate,
+    configureHTTPS,
+    setAuthentication,
+    configureFirewall,
+    testConfiguration,
+  ];
+
+  const progress = new StepProgress(setupSteps);
+  progress.start();
+
+  for (let i = 0; i < actions.length; i++) {
     try {
-      await step.action();
-      spinner.succeed(chalk.green(step.text));
-    } catch (error) {
-      spinner.fail(chalk.red(step.text));
-      console.error(chalk.red(`Error: ${error.message}`));
+      await actions[i]();
+      if (i < actions.length - 1) {
+        progress.next();
+      }
+    } catch (error: any) {
+      progress.fail(colors.error(`${symbols.cross} ${error.message || 'Setup failed'}`))
       process.exit(1);
     }
   }
 
-  console.log(chalk.green.bold('\n[SUCCESS] WinRM configured successfully'));
+  progress.finish(colors.success(`${symbols.check} ${messages.success.configured}`));
   displayAnsibleConfig();
 }
 
@@ -66,17 +79,19 @@ async function testConfiguration() {
 }
 
 function displayAnsibleConfig() {
-  console.log(chalk.cyan('\nReady for Ansible! Add to inventory:'));
-  console.log(chalk.gray('━'.repeat(40)));
-  console.log(`[windows]
-server1 ansible_host=${getHostIP()}
-
-[windows:vars]
-ansible_user=Administrator
-ansible_connection=winrm
-ansible_winrm_transport=ntlm
-ansible_winrm_server_cert_validation=ignore`);
-  console.log(chalk.gray('━'.repeat(40)));
+  console.log();
+  console.log(colors.muted(`  ${messages.prompts.ansibleConfig}`));
+  console.log(colors.dim('  ' + symbols.line.repeat(40)));
+  console.log(colors.muted(`  [windows]
+  server1 ansible_host=${getHostIP()}
+  
+  [windows:vars]
+  ansible_user=Administrator
+  ansible_connection=winrm
+  ansible_winrm_transport=ntlm
+  ansible_winrm_server_cert_validation=ignore`));
+  console.log(colors.dim('  ' + symbols.line.repeat(40)));
+  console.log();
 }
 
 function getHostIP(): string {

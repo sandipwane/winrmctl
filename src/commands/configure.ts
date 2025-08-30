@@ -1,13 +1,13 @@
-import chalk from 'chalk';
-import ora from 'ora';
 import { PowerShellRunner } from '../lib/powershell.js';
 import { ProfileManager } from '../lib/profiles.js';
+import { withSpinner, colors, symbols, messages, configSummary, alert } from '../lib/ui.js';
 
 export async function configureCommand(options: any) {
   const ps = new PowerShellRunner();
   const profileManager = new ProfileManager();
 
-  console.log(chalk.blue.bold('\nApplying WinRM Configuration'));
+  console.log();
+  console.log(colors.muted('  Applying WinRM Configuration\n'));
 
   let config = options;
 
@@ -16,46 +16,47 @@ export async function configureCommand(options: any) {
     config = { ...profile, ...options };
   }
 
-  const spinner = ora('Applying configuration...').start();
-
   try {
     if (options.check) {
-      spinner.info('Dry run mode - no changes will be made');
-      console.log(chalk.cyan('\nConfiguration to apply:'));
-      console.log(JSON.stringify(config, null, 2));
-      spinner.succeed('Dry run complete');
+      alert(messages.info.dryRun, 'info');
+      configSummary(config);
+      console.log(colors.success(`  ${symbols.check} Dry run complete\n`));
       return;
     }
 
     await ps.checkAdminPrivileges();
 
     if (config.cert === 'auto') {
-      spinner.text = 'Creating self-signed certificate...';
-      await ps.createSelfSignedCertificate();
+      await withSpinner(messages.info.creatingCert, async () => {
+        await ps.createSelfSignedCertificate();
+      });
     }
 
-    spinner.text = 'Configuring WinRM listener...';
-    await ps.configureHTTPSListener(config.port || 5986);
+    await withSpinner(messages.info.configuringHTTPS, async () => {
+      await ps.configureHTTPSListener(config.port || 5986);
+    });
 
     if (config.auth) {
-      spinner.text = 'Setting authentication methods...';
-      const authMethods = config.auth.split(',').map(s => s.trim());
-      await ps.setAuthMethods(authMethods);
+      await withSpinner(messages.info.settingAuth, async () => {
+        const authMethods = config.auth.split(',').map((s: string) => s.trim());
+        await ps.setAuthMethods(authMethods);
+      });
     }
 
     if (!config.skipFirewall) {
-      spinner.text = 'Configuring firewall rules...';
-      await ps.configureFirewallRules(config.port || 5986);
+      await withSpinner(messages.info.updatingFirewall, async () => {
+        await ps.configureFirewallRules(config.port || 5986);
+      });
     }
 
     if (config.allowUnencrypted && !config.force) {
-      spinner.fail('Allow unencrypted requires --force flag for safety');
+      alert('Allow unencrypted requires --force flag for safety', 'error');
       return;
     }
 
-    spinner.succeed(chalk.green('Configuration applied successfully'));
-  } catch (error) {
-    spinner.fail(chalk.red(`Configuration failed: ${error.message}`));
+    console.log(colors.success(`\n  ${symbols.check} ${messages.success.configured}\n`));
+  } catch (error: any) {
+    console.log(colors.error(`\n  ${symbols.cross} Configuration failed: ${error.message}\n`));
     process.exit(1);
   }
 }

@@ -1,58 +1,60 @@
-import chalk from 'chalk';
-import ora from 'ora';
 import { PowerShellRunner } from '../lib/powershell.js';
+import { withSpinner, colors, symbols, messages, header, statusLine } from '../lib/ui.js';
 
 export async function testCommand(options: any) {
   const ps = new PowerShellRunner();
   
-  console.log(chalk.blue.bold('\nTesting WinRM Connection'));
-  console.log(chalk.gray('━'.repeat(40)));
+  header('WinRM Connection Test');
 
   const host = options.host || 'localhost';
   const user = options.user || process.env.USERNAME || 'Administrator';
   const port = options.port || 5986;
 
-  console.log(chalk.cyan('Connection Details:'));
-  console.log(`  Host: ${host}`);
-  console.log(`  Port: ${port}`);
-  console.log(`  User: ${user}`);
-  console.log(`  Certificate Validation: ${options.certValidation === 'skip' ? 'Skipped' : 'Strict'}`);
+  console.log(colors.muted('  Connection Details'));
+  console.log(statusLine('Host', host));
+  console.log(statusLine('Port', port.toString()));
+  console.log(statusLine('User', user));
+  console.log(statusLine('Cert Validation', options.certValidation === 'skip' ? 'Skipped' : 'Strict',
+    options.certValidation === 'skip' ? 'warning' : 'success'));
   console.log();
 
-  const spinner = ora('Testing connection...').start();
-
   try {
-    const result = await ps.testWinRMConnection(host, port, {
-      user,
-      password: options.password,
-      skipCertValidation: options.certValidation === 'skip' || options.skipCertValidation,
+    const result = await withSpinner('Testing connection...', async () => {
+      return await ps.testWinRMConnection(host, port, {
+        user,
+        password: options.password,
+        skipCertValidation: options.certValidation === 'skip' || options.skipCertValidation,
+      });
     });
 
     if (result.success) {
-      spinner.succeed(chalk.green('Connection successful'));
+      console.log(colors.success(`\n  ${symbols.check} ${messages.success.tested}`));
       
       if (result.details) {
-        console.log(chalk.cyan('\nConnection Details:'));
-        console.log(`  Protocol: ${result.details.protocol}`);
-        console.log(`  Auth Method: ${result.details.authMethod}`);
-        console.log(`  Response Time: ${result.details.responseTime}ms`);
+        console.log();
+        console.log(colors.muted('  Connection Metrics'));
+        console.log(statusLine('Protocol', result.details.protocol));
+        console.log(statusLine('Auth Method', result.details.authMethod));
+        console.log(statusLine('Response Time', `${result.details.responseTime}ms`,
+          result.details.responseTime < 100 ? 'success' : result.details.responseTime < 500 ? 'warning' : 'error'));
       }
     } else {
-      spinner.fail(chalk.red('Connection failed'));
+      console.log(colors.error(`\n  ${symbols.cross} ${messages.errors.connectionFailed}`));
       
       if (result.error) {
-        console.log(chalk.red(`\nError: ${result.error}`));
+        console.log(colors.error(`\n  Error: ${result.error}`));
         
         if (result.troubleshooting) {
-          console.log(chalk.yellow('\nTroubleshooting:'));
-          result.troubleshooting.forEach(tip => {
-            console.log(`  • ${tip}`);
+          console.log();
+          console.log(colors.warning(`  ${symbols.info} Troubleshooting Tips:`));
+          result.troubleshooting.forEach((tip: string) => {
+            console.log(colors.muted(`    ${symbols.bullet} ${tip}`));
           });
         }
       }
     }
-  } catch (error) {
-    spinner.fail(chalk.red(`Test failed: ${error.message}`));
+  } catch (error: any) {
+    console.log(colors.error(`\n  ${symbols.cross} Test failed: ${error.message}`));
     process.exit(1);
   }
 }

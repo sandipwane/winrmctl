@@ -200,17 +200,89 @@ export const messages = {
     configured: '✓ WinRM is ready to use',
     tested: '✓ Connection test passed',
     removed: '✓ WinRM settings have been reset',
+    certCreated: '✓ Security certificate generated',
+    authConfigured: '✓ Authentication configured',
+    firewallUpdated: '✓ Firewall rules updated',
+    serviceStarted: '✓ WinRM service started',
   },
   
   prompts: {
     ansibleConfig: 'Ansible Configuration (copy this):',
     testAnother: 'Test another connection?',
     confirmRemove: 'This will disable WinRM. Continue?',
+    selectProfile: 'Choose a configuration profile:',
+    enterPassword: 'Enter password:',
+    skipCert: 'Skip certificate validation?',
   },
   
   errors: {
     notAdmin: '⚠ Please run as Administrator',
     connectionFailed: '✗ Could not connect to WinRM',
     certError: '✗ Could not create certificate',
+    serviceError: '✗ WinRM service is not running',
+    authError: '✗ Authentication failed',
+    firewallError: '✗ Could not configure firewall',
+    invalidConfig: '✗ Invalid configuration',
+  },
+  
+  info: {
+    checkingPrereqs: 'Verifying system requirements',
+    creatingCert: 'Generating security certificate',
+    configuringHTTPS: 'Setting up secure connection',
+    settingAuth: 'Configuring authentication',
+    updatingFirewall: 'Updating firewall settings',
+    testingConfig: 'Verifying setup works',
+    applyingConfig: 'Applying configuration',
+    dryRun: 'Dry run mode - no changes will be made',
   }
 };
+
+// Display configuration summary
+export function configSummary(config: any) {
+  console.log();
+  console.log(colors.muted('  Configuration Summary'));
+  divider(30);
+  
+  if (config.port) {
+    console.log(statusLine('Port', config.port.toString()));
+  }
+  if (config.auth) {
+    const authMethods = Array.isArray(config.auth) ? config.auth : config.auth.split(',');
+    console.log(statusLine('Auth Methods', authMethods.join(', ')));
+  }
+  if (config.cert) {
+    console.log(statusLine('Certificate', config.cert === 'auto' ? 'Auto-generate' : config.cert));
+  }
+  if (config.firewall !== undefined) {
+    console.log(statusLine('Firewall', config.firewall ? 'Configure' : 'Skip'));
+  }
+  
+  console.log();
+}
+
+// Display troubleshooting tips
+export function troubleshootingTips(tips: string[]) {
+  console.log();
+  console.log(colors.warning(`  ${symbols.info} Troubleshooting Tips:`));
+  tips.forEach(tip => {
+    console.log(colors.muted(`    ${symbols.bullet} ${tip}`));
+  });
+  console.log();
+}
+
+// Format time duration
+export function formatDuration(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+  return `${Math.floor(ms / 60000)}m ${Math.floor((ms % 60000) / 1000)}s`;
+}
+
+// Display step result
+export function stepResult(label: string, success: boolean, detail?: string) {
+  const icon = success ? colors.success(symbols.check) : colors.error(symbols.cross);
+  const status = success ? colors.success('Success') : colors.error('Failed');
+  console.log(`  ${icon} ${label.padEnd(30)} ${status}`);
+  if (detail) {
+    console.log(colors.muted(`    ${detail}`));
+  }
+}
