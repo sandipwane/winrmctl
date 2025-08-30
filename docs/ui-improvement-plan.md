@@ -54,11 +54,11 @@ This document outlines the transformation of winrmctl's user interface from a tr
 ```
 winrmctl
 
-Quick Setup       →  Secure defaults, one click
-Custom Setup      →  Full control over config  
-Test Connection   →  Verify existing setup
-Show Status       →  Current configuration
-Remove Config     →  Clean up WinRM settings
+Quick Setup       →  Auto-configure with best practices
+Custom Setup      →  Choose settings step-by-step
+Test Connection   →  Check if WinRM is working
+Show Status       →  View current WinRM settings
+Remove Config     →  Disable and reset WinRM
 
 Exit (q)
 ```
@@ -67,11 +67,11 @@ Exit (q)
 ```
 winrmctl setup
 
-  ◆  Quick Setup         Secure defaults, one click
-  ○  Custom Setup        Full control over config
-  ○  Test Connection     Verify existing setup
-  ○  Show Status         Current configuration
-  ○  Remove Config       Clean up WinRM settings
+  ◆  Quick Setup         Auto-configure with best practices
+  ○  Custom Setup        Choose settings step-by-step
+  ○  Test Connection     Check if WinRM is working
+  ○  Show Status         View current WinRM settings
+  ○  Remove Config       Disable and reset WinRM
   
   Press q to exit
 ```
@@ -302,27 +302,27 @@ export async function initCommand(options: any) {
     {
       name: 'Quick Setup',
       value: 'quick',
-      description: 'Secure defaults, one click'
+      description: 'Auto-configure with best practices'
     },
     {
       name: 'Custom Setup',
       value: 'custom',
-      description: 'Full control over config'
+      description: 'Choose settings step-by-step'
     },
     {
       name: 'Test Connection',
       value: 'test',
-      description: 'Verify existing setup'
+      description: 'Check if WinRM is working'
     },
     {
       name: 'Show Status',
       value: 'status',
-      description: 'Current configuration'
+      description: 'View current WinRM settings'
     },
     {
       name: 'Remove Config',
       value: 'remove',
-      description: 'Clean up WinRM settings'
+      description: 'Disable and reset WinRM'
     },
     {
       name: colors.dim('Exit'),
@@ -361,6 +361,109 @@ export function displayStatus(status: any) {
     status.auth.kerberos ? 'success' : undefined));
   console.log(statusLine('Basic', status.auth.basic ? 'Enabled' : 'Disabled',
     status.auth.basic ? 'warning' : undefined));
+}
+```
+
+## Progress Messages and User Feedback
+
+### Quick Setup Progress Messages
+
+Use clear, action-oriented language that non-technical users can understand:
+
+```typescript
+// Progress messages for Quick Setup
+const setupSteps = [
+  'Verifying system requirements',      // was: "Checking prerequisites"
+  'Generating security certificate',     // was: "Creating self-signed certificate"
+  'Setting up secure connection',        // was: "Configuring HTTPS listener"
+  'Configuring authentication',          // was: "Setting authentication methods"
+  'Updating firewall settings',          // was: "Configuring firewall rules"
+  'Verifying setup works',              // was: "Testing configuration"
+];
+
+// Usage with StepProgress
+const progress = new StepProgress(setupSteps);
+progress.start();
+// ... perform each step
+progress.next();
+// ... continue
+progress.finish('✓ WinRM is ready to use');
+```
+
+### Custom Setup Profile Descriptions
+
+Make profiles clearer with outcome-focused descriptions:
+
+```typescript
+const profiles = [
+  {
+    name: 'Production',
+    value: 'production',
+    description: 'Enterprise-ready • Domain auth • Maximum security',
+    // was: "Kerberos/NTLM auth • Required certificates • Strict firewall"
+  },
+  {
+    name: 'Development',
+    value: 'development',
+    description: 'Local testing • Mixed auth • Flexible security',
+    // was: "Basic/NTLM auth • Self-signed certs OK • Relaxed firewall"
+  },
+  {
+    name: 'Testing',
+    value: 'testing',
+    description: 'CI/CD ready • Simple auth • Minimal restrictions',
+    // was: "Basic auth enabled • Self-signed certs • Open firewall"
+  },
+];
+```
+
+### Success and Error Messages
+
+Use encouraging, clear feedback:
+
+```typescript
+// Success messages
+export const messages = {
+  success: {
+    configured: '✓ WinRM is ready to use',           // was: "[SUCCESS] WinRM configured successfully"
+    tested: '✓ Connection test passed',              // was: "[SUCCESS] Connection established"
+    removed: '✓ WinRM settings have been reset',     // was: "[SUCCESS] Configuration removed"
+  },
+  
+  prompts: {
+    ansibleConfig: 'Ansible Configuration (copy this):', // was: "Ready for Ansible! Add to inventory:"
+    testAnother: 'Test another connection?',            // was: "Do you want to test another host?"
+    confirmRemove: 'This will disable WinRM. Continue?', // was: "Are you sure you want to remove WinRM configuration?"
+  },
+  
+  errors: {
+    notAdmin: '⚠ Please run as Administrator',          // was: "[ERROR] Administrator privileges required"
+    connectionFailed: '✗ Could not connect to WinRM',   // was: "[ERROR] Connection failed"
+    certError: '✗ Could not create certificate',        // was: "[ERROR] Certificate generation failed"
+  }
+};
+```
+
+### Status Display
+
+Clean, scannable status output:
+
+```typescript
+// Before:
+// WinRM Service:     ● Running
+// Startup Type:      Automatic
+// PS Remoting:       ✓ Enabled
+
+// After:
+export function displayStatus(status: any) {
+  console.log('Service');
+  console.log('  Status:    ' + (status.running ? chalk.green('Running') : chalk.red('Stopped')));
+  console.log('  Startup:   ' + status.startupType);
+  console.log('  Remoting:  ' + (status.psRemoting ? chalk.green('Enabled') : chalk.gray('Disabled')));
+  
+  console.log('\nSecurity');
+  console.log('  HTTPS:     ' + (status.https ? chalk.green('Configured') : chalk.yellow('Not configured')));
+  console.log('  Auth:      ' + getAuthMethods(status.auth).join(', '));
 }
 ```
 
@@ -460,7 +563,7 @@ Available built-in spinner types from ora:
 
 ## Before & After Comparison
 
-### Before:
+### Before (Current Implementation):
 ```
 ╔══════════════════════════════════════╗
 ║         winrmctl Setup Wizard        ║
@@ -471,19 +574,42 @@ Available built-in spinner types from ora:
      → Secure defaults, one click
   [CUSTOM] Custom Setup
      → Full control over config
+  [TEST] Test Connection
+     → Verify existing setup
+  [STATUS] Show Status
+     → Current configuration
 ```
 
-### After:
+### After (Proposed Design):
 ```
 winrmctl
 Windows Remote Management Configuration
 
-  ◆  Quick Setup         Secure defaults, one click
-  ○  Custom Setup        Full control over config
-  ○  Test Connection     Verify existing setup
-  ○  Show Status         Current configuration
+  ◆  Quick Setup         Auto-configure with best practices
+  ○  Custom Setup        Choose settings step-by-step
+  ○  Test Connection     Check if WinRM is working
+  ○  Show Status         View current WinRM settings
+  ○  Remove Config       Disable and reset WinRM
   
   Exit (q)
+```
+
+### Progress Display Comparison:
+
+**Before:**
+```
+[INFO] Checking prerequisites...
+[INFO] Creating self-signed certificate...
+[INFO] Configuring HTTPS listener...
+[ERROR] Certificate generation failed
+```
+
+**After:**
+```
+⠋ Verifying system requirements
+⠙ Generating security certificate
+⠹ Setting up secure connection
+✗ Could not create certificate
 ```
 
 ## Testing Guidelines
