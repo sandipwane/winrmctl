@@ -1,16 +1,34 @@
 {
 	"name": "winrmctl",
 	"version": "0.1.0",
-	"description": "A Bun CLI tool that simplifies WinRM configuration for Ansible and remote management",
+	"description": "A CLI tool that simplifies WinRM configuration for Ansible and remote management",
+	"keywords": [
+		"winrm",
+		"windows",
+		"remote-management",
+		"ansible",
+		"powershell",
+		"cli",
+		"devops",
+		"automation"
+	],
+	"author": "Sandip Wane",
 	"license": "MIT",
+	"homepage": "https://github.com/sandipwane/winrmctl",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sandipwane/winrmctl.git"
+	},
+	"bugs": {
+		"url": "https://github.com/sandipwane/winrmctl/issues"
+	},
 	"type": "module",
-	"main": "dist/index.js",
+	"main": "dist/cli.js",
 	"bin": {
 		"winrmctl": "dist/cli.js"
 	},
 	"engines": {
-		"node": ">=18.0.0",
-		"bun": ">=1.0.0"
+		"node": ">=18.0.0"
 	},
 	"scripts": {
 		"dev": "bun run src/cli.ts",

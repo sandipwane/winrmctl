@@ -1,0 +1,40 @@
+# Source files
+src/
+*.ts
+
+# Config files
+.eslintrc*
+tsconfig.json
+.prettierrc*
+bun.lockb
+
+# Development files
+CLAUDE.md
+references/
+*.test.ts
+*.spec.ts
+
+# Git files
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build files
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+npm-debug.log*
