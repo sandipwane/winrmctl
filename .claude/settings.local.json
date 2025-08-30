@@ -11,7 +11,8 @@
       "Bash(tmux capture-pane:*)",
       "Bash(tmux send-keys:*)",
       "Bash(bun:*)",
-      "Bash(tmux list-sessions:*)"
+      "Bash(tmux list-sessions:*)",
+      "Bash(npm publish:*)"
     ],
     "deny": [],
     "ask": []
