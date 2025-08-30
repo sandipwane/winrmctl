@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import figures from 'figures';
 import { PowerShellRunner } from '../lib/powershell.js';
 
 export async function statusCommand(options: any) {
@@ -28,27 +29,27 @@ export async function statusCommand(options: any) {
 
 function displayServiceStatus(service: any) {
   console.log(chalk.cyan('\nService Status'));
-  console.log(`  ├─ WinRM Service:     ${service.running ? chalk.green('✅ Running') : chalk.red('❌ Stopped')}`);
+  console.log(`  ├─ WinRM Service:     ${service.running ? chalk.green(figures.circleFilled + ' Running') : chalk.red(figures.cross + ' Stopped')}`);
   console.log(`  ├─ Startup Type:      ${service.startupType}`);
-  console.log(`  └─ PS Remoting:       ${service.psRemoting ? chalk.green('✅ Enabled') : chalk.red('❌ Disabled')}`);
+  console.log(`  └─ PS Remoting:       ${service.psRemoting ? chalk.green(figures.tick + ' Enabled') : chalk.red(figures.cross + ' Disabled')}`);
 }
 
 function displayListeners(listeners: any) {
   console.log(chalk.cyan('\nListeners'));
   if (listeners.http) {
-    console.log(`  ├─ HTTP (5985):       ${listeners.http.active ? chalk.green('✅ Active') : chalk.red('❌ Inactive')}`);
+    console.log(`  ├─ HTTP (5985):       ${listeners.http.active ? chalk.green(figures.circleFilled + ' Active') : chalk.gray(figures.circle + ' Inactive')}`);
   }
   if (listeners.https) {
-    console.log(`  └─ HTTPS (5986):      ${listeners.https.active ? chalk.green('✅ Active') : chalk.red('❌ Inactive')}`);
+    console.log(`  └─ HTTPS (5986):      ${listeners.https.active ? chalk.green(figures.circleFilled + ' Active') : chalk.gray(figures.circle + ' Inactive')}`);
   }
 }
 
 function displayAuthentication(auth: any) {
   console.log(chalk.cyan('\nAuthentication'));
-  console.log(`  ├─ Basic:             ${auth.basic ? chalk.yellow('⚠️  Enabled') : chalk.green('❌ Disabled')}`);
-  console.log(`  ├─ NTLM:              ${auth.ntlm ? chalk.green('✅ Enabled') : chalk.red('❌ Disabled')}`);
-  console.log(`  ├─ Kerberos:          ${auth.kerberos ? chalk.green('✅ Enabled') : chalk.red('❌ Disabled')}`);
-  console.log(`  └─ CredSSP:           ${auth.credssp ? chalk.yellow('⚠️  Enabled') : chalk.green('❌ Disabled')}`);
+  console.log(`  ├─ Basic:             ${auth.basic ? chalk.yellow(figures.warning + ' Enabled (Insecure)') : chalk.gray(figures.circle + ' Disabled')}`);
+  console.log(`  ├─ NTLM:              ${auth.ntlm ? chalk.green(figures.tick + ' Enabled') : chalk.gray(figures.circle + ' Disabled')}`);
+  console.log(`  ├─ Kerberos:          ${auth.kerberos ? chalk.green(figures.tick + ' Enabled') : chalk.gray(figures.circle + ' Disabled')}`);
+  console.log(`  └─ CredSSP:           ${auth.credssp ? chalk.yellow(figures.warning + ' Enabled (Security Risk)') : chalk.gray(figures.circle + ' Disabled')}`);
 }
 
 function displaySecurity(security: any) {
@@ -57,6 +58,6 @@ function displaySecurity(security: any) {
     console.log(`  ├─ Certificate:       ${security.certificate.type}`);
     console.log(`  ├─ Thumbprint:        ${security.certificate.thumbprint?.substring(0, 12)}...`);
   }
-  console.log(`  └─ Unencrypted:       ${security.allowUnencrypted ? chalk.red('⚠️  Enabled') : chalk.green('❌ Disabled')}`);
-  console.log(chalk.gray('\n━'.repeat(40)));
+  console.log(`  └─ Unencrypted:       ${security.allowUnencrypted ? chalk.red(figures.cross + ' Enabled (Dangerous)') : chalk.green(figures.tick + ' Disabled')}`);
+  console.log('');
 }

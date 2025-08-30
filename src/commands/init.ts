@@ -17,23 +17,23 @@ export async function initCommand(options: any) {
       message: 'What would you like to do?',
       choices: [
         {
-          name: `${chalk.green('🚀')} Quick Setup ${chalk.gray('(Recommended)')}\n     ${chalk.gray('→ Secure defaults, one click')}`,
+          name: `${chalk.green('[QUICK]')} Quick Setup ${chalk.gray('(Recommended)')}\n     ${chalk.gray('→ Secure defaults, one click')}`,
           value: 'quick',
         },
         {
-          name: `${chalk.blue('⚙️')}  Custom Setup\n     ${chalk.gray('→ Full control over config')}`,
+          name: `${chalk.blue('[CUSTOM]')} Custom Setup\n     ${chalk.gray('→ Full control over config')}`,
           value: 'custom',
         },
         {
-          name: `${chalk.yellow('🔍')} Test Connection\n     ${chalk.gray('→ Verify existing setup')}`,
+          name: `${chalk.yellow('[TEST]')} Test Connection\n     ${chalk.gray('→ Verify existing setup')}`,
           value: 'test',
         },
         {
-          name: `${chalk.cyan('📊')} Show Status\n     ${chalk.gray('→ Current configuration')}`,
+          name: `${chalk.cyan('[STATUS]')} Show Status\n     ${chalk.gray('→ Current configuration')}`,
           value: 'status',
         },
         {
-          name: `${chalk.red('🗑️')}  Remove Configuration\n     ${chalk.gray('→ Clean up WinRM settings')}`,
+          name: `${chalk.red('[REMOVE]')} Remove Configuration\n     ${chalk.gray('→ Clean up WinRM settings')}`,
           value: 'remove',
         },
         new inquirer.Separator(),

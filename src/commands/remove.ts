@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 export async function removeCommand(options: any) {
-  console.log(chalk.red.bold('\n⚠️  Remove WinRM Configuration'));
+  console.log(chalk.red.bold('\n[WARNING] Remove WinRM Configuration'));
   console.log(chalk.gray('This will remove all WinRM configuration and listeners.'));
   
   if (!options.force) {

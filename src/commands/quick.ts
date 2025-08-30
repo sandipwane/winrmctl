@@ -6,7 +6,7 @@ import { PowerShellRunner } from '../lib/powershell.js';
 import { CertificateManager } from '../lib/certificate.js';
 
 export async function quickCommand(options: any) {
-  console.log(chalk.blue.bold('🚀 Starting Quick Setup'));
+  console.log(chalk.blue.bold('Starting Quick Setup'));
   console.log(chalk.gray('Configuring WinRM with secure defaults...\n'));
 
   const steps = [
@@ -22,15 +22,15 @@ export async function quickCommand(options: any) {
     const spinner = ora(step.text).start();
     try {
       await step.action();
-      spinner.succeed(chalk.green(`✅ ${step.text}`));
+      spinner.succeed(chalk.green(step.text));
     } catch (error) {
-      spinner.fail(chalk.red(`❌ ${step.text}`));
+      spinner.fail(chalk.red(step.text));
       console.error(chalk.red(`Error: ${error.message}`));
       process.exit(1);
     }
   }
 
-  console.log(chalk.green.bold('\n✅ WinRM configured successfully!'));
+  console.log(chalk.green.bold('\n[SUCCESS] WinRM configured successfully'));
   displayAnsibleConfig();
 }
 

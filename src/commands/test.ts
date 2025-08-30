@@ -29,7 +29,7 @@ export async function testCommand(options: any) {
     });
 
     if (result.success) {
-      spinner.succeed(chalk.green('✅ Connection successful!'));
+      spinner.succeed(chalk.green('Connection successful'));
       
       if (result.details) {
         console.log(chalk.cyan('\nConnection Details:'));
@@ -38,7 +38,7 @@ export async function testCommand(options: any) {
         console.log(`  Response Time: ${result.details.responseTime}ms`);
       }
     } else {
-      spinner.fail(chalk.red('❌ Connection failed'));
+      spinner.fail(chalk.red('Connection failed'));
       
       if (result.error) {
         console.log(chalk.red(`\nError: ${result.error}`));
