@@ -8,6 +8,8 @@ winrmctl automates the complex process of configuring WinRM on Windows hosts for
 
 The CLI ensures security best practices by default: HTTPS-only connections, proper certificate handling, and appropriate authentication methods. It generates ready-to-use Ansible inventory snippets and provides clear feedback on configuration status.
 
+<img src="images/image.png" alt="winrmctl quick setup screenshot" width="600">
+
 ## Installation
 
 Install winrmctl globally with npm or Bun:
