@@ -3,7 +3,11 @@
     "allow": [
       "WebSearch",
       "Bash(aws ec2 describe-instances:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(bunx create-ink-app:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

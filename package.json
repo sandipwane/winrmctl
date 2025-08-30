@@ -1,0 +1,12 @@
+{
+	"name": "winrmctl",
+	"version": "0.0.1",
+	"license": "MIT",
+	"type": "module",
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {},
+	"dependencies": {},
+	"devDependencies": {}
+}
