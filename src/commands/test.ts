@@ -28,7 +28,7 @@ export async function testCommand(options: any) {
     });
 
     if (result.success) {
-      console.log(colors.success(`\n  ${symbols.check} ${messages.success.tested}`));
+      console.log(colors.success(`\n  ${messages.success.tested}`));
       
       if (result.details) {
         console.log();

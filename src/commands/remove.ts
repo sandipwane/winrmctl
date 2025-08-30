@@ -34,7 +34,7 @@ export async function removeCommand(options: any) {
       // await ps.removeWinRMConfiguration();
     });
     
-    console.log(colors.success(`\n  ${symbols.check} ${messages.success.removed}\n`));
+    console.log(colors.success(`\n  ${messages.success.removed}\n`));
   } catch (error: any) {
     console.log(colors.error(`\n  ${symbols.cross} Failed to remove configuration: ${error.message}\n`));
     process.exit(1);

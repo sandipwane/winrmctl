@@ -54,7 +54,7 @@ export async function configureCommand(options: any) {
       return;
     }
 
-    console.log(colors.success(`\n  ${symbols.check} ${messages.success.configured}\n`));
+    console.log(colors.success(`\n  ${messages.success.configured}\n`));
   } catch (error: any) {
     console.log(colors.error(`\n  ${symbols.cross} Configuration failed: ${error.message}\n`));
     process.exit(1);

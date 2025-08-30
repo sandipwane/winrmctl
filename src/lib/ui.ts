@@ -91,14 +91,15 @@ export async function withSpinner(message: string, task: () => Promise<any>) {
     text: message,
     spinner: 'dots',
     color: 'cyan',
+    indent: 2,
   }).start();
   
   try {
     const result = await task();
-    spinner.succeed(chalk.green(`${symbols.check} ${message}`));
+    spinner.succeed(colors.success(message));
     return result;
   } catch (error) {
-    spinner.fail(chalk.red(`${symbols.cross} ${message}`));
+    spinner.fail(colors.error(message));
     throw error;
   }
 }
