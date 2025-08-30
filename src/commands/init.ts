@@ -1,5 +1,6 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import { header, selectPrompt, colors, symbols } from '../lib/ui.js';
 import { quickCommand } from './quick.js';
 import { configureCommand } from './configure.js';
 import { testCommand } from './test.js';
@@ -7,46 +8,44 @@ import { statusCommand } from './status.js';
 import { removeCommand } from './remove.js';
 
 export async function initCommand(options: any) {
-  console.clear();
-  displayHeader();
+  header('winrmctl', 'Windows Remote Management Configuration');
 
-  const { action } = await inquirer.prompt([
+  const choices = [
     {
-      type: 'list',
-      name: 'action',
-      message: 'What would you like to do?',
-      pageSize: 15,
-      choices: [
-        {
-          name: `${chalk.green('[QUICK]')} Quick Setup ${chalk.gray('(Recommended)')}\n     ${chalk.gray('→ Secure defaults, one click')}`,
-          value: 'quick',
-        },
-        {
-          name: `${chalk.blue('[CUSTOM]')} Custom Setup\n     ${chalk.gray('→ Full control over config')}`,
-          value: 'custom',
-        },
-        {
-          name: `${chalk.yellow('[TEST]')} Test Connection\n     ${chalk.gray('→ Verify existing setup')}`,
-          value: 'test',
-        },
-        {
-          name: `${chalk.cyan('[STATUS]')} Show Status\n     ${chalk.gray('→ Current configuration')}`,
-          value: 'status',
-        },
-        {
-          name: `${chalk.red('[REMOVE]')} Remove Configuration\n     ${chalk.gray('→ Clean up WinRM settings')}`,
-          value: 'remove',
-        },
-        new inquirer.Separator(),
-        {
-          name: chalk.gray('Exit'),
-          value: 'exit',
-        },
-      ],
+      name: 'Quick Setup',
+      value: 'quick',
+      description: 'Auto-configure with best practices'
     },
-  ]);
+    {
+      name: 'Custom Setup',
+      value: 'custom',
+      description: 'Choose settings step-by-step'
+    },
+    {
+      name: 'Test Connection',
+      value: 'test',
+      description: 'Check if WinRM is working'
+    },
+    {
+      name: 'Show Status',
+      value: 'status',
+      description: 'View current WinRM settings'
+    },
+    {
+      name: 'Remove Config',
+      value: 'remove',
+      description: 'Disable and reset WinRM'
+    },
+    {
+      name: colors.dim('Exit'),
+      value: 'exit',
+      description: ''
+    }
+  ];
 
-  switch (action) {
+  const { selection } = await selectPrompt('Select an option:', choices);
+
+  switch (selection) {
     case 'quick':
       await quickCommand(options);
       break;
@@ -63,107 +62,114 @@ export async function initCommand(options: any) {
       await removeCommand(options);
       break;
     case 'exit':
-      console.log(chalk.gray('\nGoodbye!'));
+      console.log(colors.muted('\n  Goodbye!\n'));
       process.exit(0);
   }
 }
 
-function displayHeader() {
-  const header = `
-╔══════════════════════════════════════╗
-║         ${chalk.bold.cyan('winrmctl Setup Wizard')}        ║
-╚══════════════════════════════════════╝
-`;
-  console.log(chalk.blue(header));
-}
-
 async function customSetupWizard(options: any) {
-  const answers = await inquirer.prompt([
+  console.log();
+  console.log(colors.muted('  Configuration Profile\n'));
+  
+  const profileChoices = [
     {
-      type: 'list',
-      name: 'profile',
-      message: 'Select configuration profile:',
-      pageSize: 15,
-      choices: [
-        {
-          name: `${chalk.green('Production')} ${chalk.gray('(Recommended)')}\n  ${chalk.gray('• Kerberos/NTLM auth\n  • Required certificates\n  • Strict firewall')}`,
-          value: 'production',
-        },
-        {
-          name: `${chalk.yellow('Development')}\n  ${chalk.gray('• Basic/NTLM auth\n  • Self-signed certs OK\n  • Relaxed firewall')}`,
-          value: 'development',
-        },
-        {
-          name: `${chalk.blue('Testing')}\n  ${chalk.gray('• Basic auth enabled\n  • Self-signed certs\n  • Open firewall')}`,
-          value: 'testing',
-        },
-        {
-          name: `${chalk.magenta('Custom')}\n  ${chalk.gray('• Configure everything manually')}`,
-          value: 'custom',
-        },
-      ],
+      name: 'Production',
+      value: 'production',
+      description: 'Enterprise-ready • Domain auth • Maximum security'
     },
-  ]);
+    {
+      name: 'Development',
+      value: 'development',
+      description: 'Local testing • Mixed auth • Flexible security'
+    },
+    {
+      name: 'Testing',
+      value: 'testing',
+      description: 'CI/CD ready • Simple auth • Minimal restrictions'
+    },
+    {
+      name: 'Custom',
+      value: 'custom',
+      description: 'Configure everything manually'
+    }
+  ];
 
-  if (answers.profile === 'custom') {
+  const { selection: profile } = await selectPrompt('Choose a profile:', profileChoices);
+
+  if (profile === 'custom') {
+    console.log();
+    console.log(colors.muted('  Custom Configuration\n'));
+    
     const customConfig = await inquirer.prompt([
       {
         type: 'number',
         name: 'port',
-        message: 'HTTPS port:',
+        message: colors.muted('  HTTPS port:'),
         default: 5986,
+        prefix: colors.muted(symbols.pointer),
       },
       {
         type: 'checkbox',
         name: 'auth',
-        message: 'Authentication methods:',
+        message: colors.muted('  Authentication methods:'),
         choices: ['Basic', 'NTLM', 'Kerberos', 'CredSSP'],
         default: ['NTLM', 'Kerberos'],
+        prefix: colors.muted(symbols.pointer),
       },
       {
         type: 'list',
         name: 'cert',
-        message: 'Certificate handling:',
+        message: colors.muted('  Certificate handling:'),
         choices: ['Auto-generate self-signed', 'Use existing', 'Import from file'],
+        prefix: colors.muted(symbols.pointer),
+        pageSize: 15,
       },
       {
         type: 'confirm',
         name: 'firewall',
-        message: 'Configure firewall rules?',
+        message: colors.muted('  Configure firewall rules?'),
         default: true,
+        prefix: colors.muted(symbols.pointer),
       },
     ]);
 
     await configureCommand({ ...options, ...customConfig });
   } else {
-    await configureCommand({ ...options, profile: answers.profile });
+    await configureCommand({ ...options, profile });
   }
 }
 
 async function testConnectionWizard(options: any) {
+  console.log();
+  console.log(colors.muted('  Connection Details\n'));
+  
   const answers = await inquirer.prompt([
     {
       type: 'input',
       name: 'host',
-      message: 'Target host:',
+      message: colors.muted('  Target host:'),
       default: 'localhost',
+      prefix: colors.muted(symbols.pointer),
     },
     {
       type: 'input',
       name: 'user',
-      message: 'Username:',
+      message: colors.muted('  Username:'),
       default: 'Administrator',
+      prefix: colors.muted(symbols.pointer),
     },
     {
       type: 'password',
       name: 'password',
-      message: 'Password:',
+      message: colors.muted('  Password:'),
+      prefix: colors.muted(symbols.pointer),
     },
     {
       type: 'confirm',
       name: 'skipCertValidation',
-      message: 'Skip certificate validation?',
+      message: colors.muted('  Skip certificate validation?'),
       default: true,
+      prefix: colors.muted(symbols.pointer),
     },
   ]);
 

@@ -190,6 +190,7 @@ export async function selectPrompt(message: string, choices: Array<{name: string
     pageSize: 15,
     loop: false,
     prefix: colors.muted(symbols.pointer),
+    suffix: colors.muted(` (${figures.arrowUp}${figures.arrowDown} to navigate)`),
   }]);
 }
 
