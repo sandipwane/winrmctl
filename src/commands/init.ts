@@ -15,6 +15,7 @@ export async function initCommand(options: any) {
       type: 'list',
       name: 'action',
       message: 'What would you like to do?',
+      pageSize: 15,
       choices: [
         {
           name: `${chalk.green('[QUICK]')} Quick Setup ${chalk.gray('(Recommended)')}\n     ${chalk.gray('→ Secure defaults, one click')}`,
@@ -82,6 +83,7 @@ async function customSetupWizard(options: any) {
       type: 'list',
       name: 'profile',
       message: 'Select configuration profile:',
+      pageSize: 15,
       choices: [
         {
           name: `${chalk.green('Production')} ${chalk.gray('(Recommended)')}\n  ${chalk.gray('• Kerberos/NTLM auth\n  • Required certificates\n  • Strict firewall')}`,

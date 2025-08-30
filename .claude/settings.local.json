@@ -10,7 +10,8 @@
       "Bash(rmdir:*)",
       "Bash(tmux capture-pane:*)",
       "Bash(tmux send-keys:*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(tmux list-sessions:*)"
     ],
     "deny": [],
     "ask": []
