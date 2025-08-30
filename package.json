@@ -1,12 +1,41 @@
 {
 	"name": "winrmctl",
-	"version": "0.0.1",
+	"version": "0.1.0",
+	"description": "A Bun CLI tool that simplifies WinRM configuration for Ansible and remote management",
 	"license": "MIT",
 	"type": "module",
-	"engines": {
-		"node": ">=16"
+	"main": "dist/index.js",
+	"bin": {
+		"winrmctl": "dist/cli.js"
 	},
-	"scripts": {},
-	"dependencies": {},
-	"devDependencies": {}
+	"engines": {
+		"node": ">=18.0.0",
+		"bun": ">=1.0.0"
+	},
+	"scripts": {
+		"dev": "bun run src/cli.ts",
+		"build": "bun build src/cli.ts --outdir dist --target node",
+		"start": "bun run dist/cli.js",
+		"test": "bun test",
+		"lint": "eslint src",
+		"typecheck": "tsc --noEmit",
+		"format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\""
+	},
+	"dependencies": {
+		"chalk": "^5.3.0",
+		"commander": "^11.1.0",
+		"inquirer": "^9.2.12",
+		"ora": "^8.0.1",
+		"yaml": "^2.3.4"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/inquirer": "^9.0.7",
+		"@types/node": "^20.10.5",
+		"@typescript-eslint/eslint-plugin": "^6.15.0",
+		"@typescript-eslint/parser": "^6.15.0",
+		"eslint": "^8.56.0",
+		"prettier": "^3.1.1",
+		"typescript": "^5.3.3"
+	}
 }
