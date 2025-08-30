@@ -7,8 +7,9 @@ import { StepProgress, colors, symbols, messages } from '../lib/ui.js';
 
 export async function quickCommand(options: any) {
   console.log();
-  console.log(colors.muted('  Quick Setup'));
-  console.log(colors.muted('  Configuring WinRM with secure defaults...\n'));
+  console.log(chalk.bold('  Quick Setup'));
+  console.log(colors.muted('  Configuring WinRM with secure defaults'));
+  console.log();
 
   const setupSteps = [
     'Verifying system requirements',      
@@ -43,7 +44,7 @@ export async function quickCommand(options: any) {
     }
   }
 
-  progress.finish(colors.success(`${symbols.check} ${messages.success.configured}`));
+  progress.finish(colors.success(messages.success.configured));
   displayAnsibleConfig();
 }
 
@@ -79,18 +80,30 @@ async function testConfiguration() {
 }
 
 function displayAnsibleConfig() {
-  console.log();
-  console.log(colors.muted(`  ${messages.prompts.ansibleConfig}`));
-  console.log(colors.dim('  ' + symbols.line.repeat(40)));
-  console.log(colors.muted(`  [windows]
-  server1 ansible_host=${getHostIP()}
+  const ip = getHostIP();
   
-  [windows:vars]
-  ansible_user=Administrator
-  ansible_connection=winrm
-  ansible_winrm_transport=ntlm
-  ansible_winrm_server_cert_validation=ignore`));
-  console.log(colors.dim('  ' + symbols.line.repeat(40)));
+  console.log();
+  console.log(chalk.bold('  Ansible Configuration'));
+  console.log(colors.muted('  Copy this to your inventory file:'));
+  console.log();
+  
+  const config = `[windows]
+server1 ansible_host=${ip}
+
+[windows:vars]
+ansible_user=Administrator
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore`;
+  
+  // Display with proper indentation and formatting
+  const lines = config.split('\n');
+  console.log(colors.dim('  ┌' + '─'.repeat(48) + '┐'));
+  lines.forEach(line => {
+    const paddedLine = line.padEnd(46);
+    console.log(colors.dim('  │ ') + colors.primary(paddedLine) + colors.dim(' │'));
+  });
+  console.log(colors.dim('  └' + '─'.repeat(48) + '┘'));
   console.log();
 }
 

@@ -2,37 +2,30 @@ import chalk from 'chalk';
 
 export class PowerShellRunner {
   async checkAdminPrivileges(): Promise<void> {
-    console.log(chalk.gray('  [Mock] Checking admin privileges...'));
     await this.delay(500);
   }
 
   async checkWinRMService(): Promise<void> {
-    console.log(chalk.gray('  [Mock] Checking WinRM service...'));
     await this.delay(500);
   }
 
   async createSelfSignedCertificate(): Promise<void> {
-    console.log(chalk.gray('  [Mock] Creating self-signed certificate...'));
     await this.delay(800);
   }
 
   async configureHTTPSListener(port: number): Promise<void> {
-    console.log(chalk.gray(`  [Mock] Configuring HTTPS listener on port ${port}...`));
     await this.delay(1000);
   }
 
   async setAuthMethods(methods: string[]): Promise<void> {
-    console.log(chalk.gray(`  [Mock] Setting auth methods: ${methods.join(', ')}...`));
     await this.delay(600);
   }
 
   async configureFirewallRules(port: number): Promise<void> {
-    console.log(chalk.gray(`  [Mock] Configuring firewall for port ${port}...`));
     await this.delay(700);
   }
 
   async testWinRMConnection(host: string, port: number, options?: any): Promise<any> {
-    console.log(chalk.gray(`  [Mock] Testing connection to ${host}:${port}...`));
     await this.delay(1500);
     return {
       success: true,

@@ -114,27 +114,33 @@ export class StepProgress {
     this.spinner = ora({
       spinner: 'dots',
       color: 'cyan',
+      indent: 2,
     });
   }
   
   start() {
-    this.spinner.start(this.steps[0]);
+    this.spinner.start(colors.muted(this.steps[0]));
   }
   
   next() {
-    this.spinner.succeed();
+    this.spinner.succeed(colors.success(this.steps[this.current]));
     this.current++;
     if (this.current < this.steps.length) {
-      this.spinner.start(this.steps[this.current]);
+      this.spinner.start(colors.muted(this.steps[this.current]));
     }
   }
   
   finish(message?: string) {
-    this.spinner.succeed(message || 'Complete!');
+    if (this.current < this.steps.length) {
+      this.spinner.succeed(colors.success(this.steps[this.current]));
+    }
+    if (message) {
+      console.log(`\n  ${message}`);
+    }
   }
   
   fail(message?: string) {
-    this.spinner.fail(message || 'Failed');
+    this.spinner.fail(message || colors.error(`${symbols.cross} Failed`));
   }
 }
 
