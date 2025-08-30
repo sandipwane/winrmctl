@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { quickCommand } from './commands/quick.js';
@@ -14,7 +14,7 @@ const program = new Command();
 program
   .name('winrmctl')
   .description('CLI tool to simplify WinRM configuration for Ansible and remote management')
-  .version('0.1.0')
+  .version('0.1.1')
   .option('--json', 'Output as JSON')
   .option('-v, --verbose', 'Verbose output')
   .option('--check', 'Dry run mode')
