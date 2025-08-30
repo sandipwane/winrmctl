@@ -2,6 +2,12 @@
 
 The winrmctl CLI simplifies Windows Remote Management (WinRM) configuration for Ansible and remote management.
 
+## Overview
+
+winrmctl automates the complex process of configuring WinRM on Windows hosts for remote management. Instead of manually running PowerShell scripts, adjusting authentication settings, managing certificates, and configuring firewall rules, winrmctl provides a single command to enable secure WinRM access.
+
+The CLI ensures security best practices by default: HTTPS-only connections, proper certificate handling, and appropriate authentication methods. It generates ready-to-use Ansible inventory snippets and provides clear feedback on configuration status.
+
 ## Installation
 
 Install winrmctl globally with npm or Bun:
